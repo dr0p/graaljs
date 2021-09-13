@@ -174,6 +174,11 @@ public final class JavaScriptLanguage extends AbstractJavaScriptLanguage {
         ensureErrorClassesInitialized();
     }
 
+    private Boolean unsafeMultithreading = false;
+    protected boolean isThreadAccessAllowed(Thread thread, boolean singleThreaded) {
+        return singleThreaded || this.unsafeMultithreading;
+    }
+
     public JavaScriptLanguage() {
         this.promiseJobsQueueEmptyAssumption = Truffle.getRuntime().createAssumption("PromiseJobsQueueEmpty");
     }
@@ -312,6 +317,8 @@ public final class JavaScriptLanguage extends AbstractJavaScriptLanguage {
         if (env.err() != realm.getErrorStream()) {
             realm.setErrorWriter(null, env.err());
         }
+
+        this.unsafeMultithreading = this.unsafeMultithreading || context.getContextOptions().isUnsafeMultithreading();
 
         return realm;
     }

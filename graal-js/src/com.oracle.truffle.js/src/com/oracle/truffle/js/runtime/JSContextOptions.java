@@ -477,6 +477,11 @@ public final class JSContextOptions {
     public static final OptionKey<Integer> FUNCTION_CACHE_LIMIT = new OptionKey<>(JSConfig.FunctionCacheLimit);
     @CompilationFinal private int functionCacheLimit;
 
+    public static final String UNSAFE_MULTITHREADING_NAME = JS_OPTION_PREFIX + "unsafe-multithreading";
+    @Option(name = UNSAFE_MULTITHREADING_NAME, category = OptionCategory.EXPERT, stability = OptionStability.EXPERIMENTAL, help = "Enable unsafe multithreading.") //
+    public static final OptionKey<Boolean> UNSAFE_MULTITHREADING = new OptionKey<>(false);
+    @CompilationFinal private boolean unsafeMultithreading;
+
     public static final String TOP_LEVEL_AWAIT_NAME = JS_OPTION_PREFIX + "top-level-await";
     @Option(name = TOP_LEVEL_AWAIT_NAME, category = OptionCategory.EXPERT, help = "Enable top-level-await.")
     // defaulting to ecmascript-version>=2022
@@ -614,6 +619,7 @@ public final class JSContextOptions {
         this.unhandledRejectionsMode = readUnhandledRejectionsMode();
         this.newSetMethods = readBooleanOption(NEW_SET_METHODS);
         this.operatorOverloading = readBooleanOption(OPERATOR_OVERLOADING);
+        this.unsafeMultithreading = readBooleanOption(UNSAFE_MULTITHREADING);
 
         this.propertyCacheLimit = readIntegerOption(PROPERTY_CACHE_LIMIT);
         this.functionCacheLimit = readIntegerOption(FUNCTION_CACHE_LIMIT);
@@ -988,6 +994,10 @@ public final class JSContextOptions {
         return operatorOverloading;
     }
 
+    public boolean isUnsafeMultithreading() {
+        return unsafeMultithreading;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -1041,6 +1051,7 @@ public final class JSContextOptions {
         hash = 53 * hash + this.unhandledRejectionsMode.ordinal();
         hash = 53 * hash + (this.newSetMethods ? 1 : 0);
         hash = 53 * hash + (this.operatorOverloading ? 1 : 0);
+        hash = 53 * hash + (this.unsafeMultithreading ? 1 : 0);
         return hash;
     }
 
@@ -1201,6 +1212,9 @@ public final class JSContextOptions {
             return false;
         }
         if (this.operatorOverloading != other.operatorOverloading) {
+            return false;
+        }
+        if (this.unsafeMultithreading != other.unsafeMultithreading) {
             return false;
         }
         return Objects.equals(this.parserOptions, other.parserOptions);
