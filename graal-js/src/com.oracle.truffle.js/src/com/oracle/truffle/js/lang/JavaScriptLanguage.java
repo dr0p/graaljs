@@ -177,6 +177,11 @@ public final class JavaScriptLanguage extends TruffleLanguage<JSRealm> {
         ensureErrorClassesInitialized();
     }
 
+    private Boolean unsafeMultithreading = false;
+    protected boolean isThreadAccessAllowed(Thread thread, boolean singleThreaded) {
+        return singleThreaded || this.unsafeMultithreading;
+    }
+
     public JavaScriptLanguage() {
         this.promiseJobsQueueEmptyAssumption = Truffle.getRuntime().createAssumption("PromiseJobsQueueEmpty");
     }
@@ -334,6 +339,9 @@ public final class JavaScriptLanguage extends TruffleLanguage<JSRealm> {
         // make sure initial environment is cleared otherwise
         // it might leak data
         context.clearInitialEnvironment();
+
+        // once unsafe multithreading is enabled in any context it should not be disabled
+        this.unsafeMultithreading = this.unsafeMultithreading || context.getContextOptions().isUnsafeMultithreading();
 
         return realm;
     }
